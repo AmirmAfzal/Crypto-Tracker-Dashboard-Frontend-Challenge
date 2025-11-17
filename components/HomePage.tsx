@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { AlertCircle, WifiOff } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -9,36 +9,12 @@ import { useFavorites } from "@/hooks/useFavorites";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useHydrated } from "@/hooks/useHydrated";
+import { useIsOffline } from "@/hooks/useIsOffline";
 
 import CryptoTable from "./CryptoTable";
 import PaginationSection from "./PaginationSection";
 import { CryptoCoin } from "@/lib/types/crypto";
-
-function useHydrated() {
-  const [hydrated, setHydrated] = useState(false);
-  useEffect(() => {
-    setHydrated(true);
-  }, []);
-  return hydrated;
-}
-
-function useIsOffline() {
-  const [isOffline, setIsOffline] = useState(false);
-
-  useEffect(() => {
-    setIsOffline(!navigator.onLine);
-
-    const handle = () => setIsOffline(!navigator.onLine);
-    window.addEventListener("online", handle);
-    window.addEventListener("offline", handle);
-    return () => {
-      window.removeEventListener("online", handle);
-      window.removeEventListener("offline", handle);
-    };
-  }, []);
-
-  return isOffline;
-}
 
 const HomePage = () => {
   const hydrated = useHydrated();
