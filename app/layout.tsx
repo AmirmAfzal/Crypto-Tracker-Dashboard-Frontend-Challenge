@@ -14,12 +14,55 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Crypto Tracker",
-  description: "Track cryptocurrency prices in real-time",
+  title: "Crypto Tracker - Real-time Cryptocurrency Prices",
+  description:
+    "Track the top cryptocurrencies in real-time. Monitor prices, 24h changes, market caps, and trends with our modern crypto dashboard.",
+  keywords: [
+    "cryptocurrency",
+    "bitcoin",
+    "ethereum",
+    "crypto tracker",
+    "market data",
+    "blockchain",
+    "digital currency",
+  ],
+  authors: [{ name: "Crypto Tracker" }],
+  applicationName: "Crypto Tracker",
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "https://example.com",
+  },
+  openGraph: {
+    title: "Crypto Tracker - Real-time Cryptocurrency Prices",
+    description:
+      "Track cryptocurrency prices, market caps, and trends in real-time with our modern crypto dashboard.",
+    url: "https://example.com",
+    siteName: "Crypto Tracker",
+    type: "website",
+    images: [
+      {
+        url: "/pwa-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "Crypto Tracker Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Crypto Tracker",
+    description:
+      "Real-time cryptocurrency market tracking dashboard with charts and prices",
+    images: ["/pwa-512x512.png"],
+  },
 };
 
 export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#14b8a6",
 };
 
