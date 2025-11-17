@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import CryptoTable from "./CryptoTable";
 import PaginationSection from "./PaginationSection";
+import { CryptoCoin } from "@/lib/types/crypto";
 
 function useHydrated() {
   const [hydrated, setHydrated] = useState(false);
@@ -56,7 +57,7 @@ const HomePage = () => {
   const filteredData = useMemo(() => {
     if (!data) return [];
     if (!showFavoritesOnly) return data;
-    return data.filter((coin) => favorites.has(coin.id));
+    return data.filter((coin : CryptoCoin) => favorites.has(coin.id));
   }, [data, showFavoritesOnly, favorites]);
 
   const handleRefresh = async () => {
