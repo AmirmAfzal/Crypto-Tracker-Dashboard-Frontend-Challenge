@@ -22,6 +22,7 @@ interface Props {
   favorites: Set<string>;
   onToggleFavorite: (coinId: string) => void;
   isLoading?: boolean;
+  page: number;
 }
 
 const CryptoTable = ({
@@ -29,6 +30,7 @@ const CryptoTable = ({
   favorites,
   onToggleFavorite,
   isLoading,
+  page,
 }: Props) => {
   if (isLoading) {
     return (
@@ -72,7 +74,7 @@ const CryptoTable = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((coin) => {
+          {data.map((coin, index) => {
             const isFavorite = favorites.has(coin.id);
             const priceChange = coin.price_change_percentage_24h;
             const isPositive = priceChange > 0;
@@ -99,17 +101,21 @@ const CryptoTable = ({
                   </Button>
                 </TableCell>
                 <TableCell className="font-medium text-muted-foreground">
-                  {coin?.market_cap_rank}
+                  {index + 1 + page * 10}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <Image
-                      src={coin.image}
-                      alt={coin.name}
-                      className="w-8 h-8 rounded-full"
-                      width={100}
-                      height={100}
-                    />
+                    {coin.image === "missing_large.png" ? (
+                      <div className="w-8 h-8 rounded-full bg-accent"></div>
+                    ) : (
+                      <Image
+                        src={coin.image}
+                        alt={coin.name}
+                        className="w-8 h-8 rounded-full"
+                        width={100}
+                        height={100}
+                      />
+                    )}
                     <div>
                       <div className="font-semibold">{coin.name}</div>
                       <div className="text-sm text-muted-foreground uppercase">
@@ -120,7 +126,7 @@ const CryptoTable = ({
                 </TableCell>
                 <TableCell className="text-right font-mono font-medium">
                   $
-                  {coin.current_price.toLocaleString(undefined, {
+                  {coin?.current_price?.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 6,
                   })}
@@ -162,6 +168,6 @@ const CryptoTable = ({
       </Table>
     </div>
   );
-}
+};
 
 export default CryptoTable;

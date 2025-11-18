@@ -6,12 +6,16 @@ const CACHE_TIMESTAMP_KEY = "crypto-cache-timestamp";
 
 const isClient = typeof window !== "undefined";
 
-const getCachedData = (page: number): CryptoCoin[] | null => {
+const getCachedData = (
+  page: number
+): { coins: CryptoCoin[]; total: number } | null => {
   if (!isClient) return null;
   try {
     const cached = localStorage.getItem(`${CACHE_KEY}-${page}`);
+    if (!cached) return { coins: [], total: 0 };
+    const data = JSON.parse(cached);
     if (cached) {
-      return JSON.parse(cached);
+      return { coins: data, total: data.length };
     }
   } catch (error) {
     console.error("Error reading from cache:", error);
@@ -46,12 +50,12 @@ const getFavoriteIds = (): string[] => {
 const fetchCryptoData = async (
   page: number,
   showFavoritesOnly?: boolean
-): Promise<CryptoCoin[]> => {
+): Promise<{ coins: CryptoCoin[]; total: number }> => {
   let apiUrl = "";
 
   if (showFavoritesOnly) {
     const favoriteIds = getFavoriteIds();
-    if (favoriteIds.length === 0) return [];
+    if (favoriteIds.length === 0) return { coins: [], total: 0 };
     apiUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&page=${page}&per_page=10&ids=${favoriteIds.join(
       ","
     )}&sparkline=true`;
@@ -65,13 +69,15 @@ const fetchCryptoData = async (
       throw new Error("Failed to fetch crypto data");
     }
     const data: CryptoCoin[] = await response.json();
+    const total = Number(response.headers.get("total")) || 0;
     if (!showFavoritesOnly) setCachedData(data, page);
-    return data;
+    return { coins: data, total: total };
   } catch (error) {
     console.error("Error fetching crypto data:", error);
     if (!showFavoritesOnly) {
       const cachedData = getCachedData(page);
-      if (cachedData) return cachedData;
+      if (cachedData)
+        return { coins: cachedData.coins, total: cachedData.total };
     }
     throw error;
   }
@@ -87,9 +93,9 @@ export const useCryptoData = (
     refetchInterval: 30000,
     staleTime: 25000,
     retry: 2,
-    initialData:
-      isClient && !showFavoritesOnly
-        ? getCachedData(page) || undefined
-        : undefined,
+    // initialData:
+    //   isClient && !showFavoritesOnly
+    //     ? getCachedData(page) || undefined
+    //     : undefined,
   });
 };

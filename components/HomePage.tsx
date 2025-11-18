@@ -30,7 +30,7 @@ const HomePage = () => {
     useCryptoData(page, showFavoritesOnly);
 
   const filteredData = useMemo(() => {
-    return data || [];
+    return data || { coins: [], total: 0 };
   }, [data]);
 
   const handleRefresh = async () => {
@@ -88,23 +88,24 @@ const HomePage = () => {
           </h2>
           <p className="text-sm text-muted-foreground">
             {showFavoritesOnly
-              ? `Showing ${filteredData.length} favorite ${
-                  filteredData.length === 1 ? "coin" : "coins"
+              ? `Showing ${filteredData.coins.length} favorite ${
+                  filteredData.coins.length === 1 ? "coin" : "coins"
                 }`
               : "Market data updates every 30 seconds"}
           </p>
         </div>
 
         <CryptoTable
-          data={filteredData}
+          data={filteredData.coins}
           favorites={favorites}
           onToggleFavorite={toggleFavorite}
           isLoading={isLoading && !data}
+          page={page}
         />
 
         {/* {!showFavoritesOnly && ( */}
         <div className="mt-8">
-          <PaginationSection totalPages={10} />
+          <PaginationSection totalPages={Math.floor(filteredData.total / 10)} />
         </div>
         {/* )} */}
       </main>

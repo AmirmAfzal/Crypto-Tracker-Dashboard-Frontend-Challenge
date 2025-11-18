@@ -10,6 +10,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationEllipsis,
 } from "@/components/ui/pagination";
 
 interface Props {
@@ -23,15 +24,55 @@ const PaginationSection = ({ totalPages }: Props) => {
 
   const currentPage = Number(searchParams.get("page") || 1);
 
+  const maxVisibleNumbers = 10;
+
+  type PageItem = number | "ellipsis";
+
+  const paginationItems = useMemo<PageItem[]>(() => {
+    if (totalPages <= maxVisibleNumbers) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const items: PageItem[] = [];
+
+    const middleCount = maxVisibleNumbers - 2; // exclude first & last
+    let start = Math.max(2, currentPage - Math.floor(middleCount / 2));
+    let end = start + middleCount - 1;
+
+    if (end >= totalPages) {
+      end = totalPages - 1;
+      start = Math.max(2, end - middleCount + 1);
+    }
+
+    // First page
+    items.push(1);
+
+    // Left ellipsis
+    if (start > 2) {
+      items.push("ellipsis");
+    }
+
+    // Middle pages
+    for (let page = start; page <= end; page++) {
+      items.push(page);
+    }
+
+    // Right ellipsis
+    if (end < totalPages - 1) {
+      items.push("ellipsis");
+    }
+
+    // Last page
+    items.push(totalPages);
+
+    return items;
+  }, [currentPage, totalPages]);
+
   const goToPage = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(page));
     router.push(`${pathname}?${params.toString()}`);
   };
-
-  const pages = useMemo(() => {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }, [totalPages]);
 
   return (
     <Pagination>
@@ -49,17 +90,26 @@ const PaginationSection = ({ totalPages }: Props) => {
         </PaginationItem>
 
         {/* Numbers */}
-        {pages.map((page) => (
-          <PaginationItem key={page} className="hidden sm:inline-block">
-            <PaginationLink
-              isActive={currentPage === page}
-              onClick={() => goToPage(page)}
-              className="cursor-pointer"
+        {paginationItems.map((item, index) =>
+          item === "ellipsis" ? (
+            <PaginationItem
+              key={`ellipsis-${index}`}
+              className="hidden sm:inline-block"
             >
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
+              <PaginationEllipsis />
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={item} className="hidden sm:inline-block">
+              <PaginationLink
+                isActive={currentPage === item}
+                onClick={() => goToPage(item)}
+                className="cursor-pointer"
+              >
+                {item}
+              </PaginationLink>
+            </PaginationItem>
+          )
+        )}
 
         {/* Next */}
         <PaginationItem>
