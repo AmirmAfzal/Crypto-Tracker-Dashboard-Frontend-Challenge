@@ -1,40 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { CryptoCoin } from "@/lib/types/crypto";
 
-const CACHE_KEY = "crypto-cache";
-const CACHE_TIMESTAMP_KEY = "crypto-cache-timestamp";
+
 
 const isClient = typeof window !== "undefined";
 
-const getCachedData = (
-  page: number
-): { coins: CryptoCoin[]; total: number } | null => {
-  if (!isClient) return null;
-  try {
-    const cached = localStorage.getItem(`${CACHE_KEY}-${page}`);
-    if (!cached) return { coins: [], total: 0 };
-    const data = JSON.parse(cached);
-    if (cached) {
-      return { coins: data, total: data.length };
-    }
-  } catch (error) {
-    console.error("Error reading from cache:", error);
-  }
-  return null;
-};
 
-const setCachedData = (data: CryptoCoin[], page: number) => {
-  if (!isClient) return;
-  try {
-    localStorage.setItem(`${CACHE_KEY}-${page}`, JSON.stringify(data));
-    localStorage.setItem(
-      `${CACHE_TIMESTAMP_KEY}-${page}`,
-      Date.now().toString()
-    );
-  } catch (error) {
-    console.error("Error writing to cache:", error);
-  }
-};
 
 export const getFavoriteIds = (): string[] => {
   if (!isClient) return [];
@@ -51,12 +22,12 @@ const fetchCryptoData = async (
   page: number,
   showFavoritesOnly?: boolean
 ): Promise<{ coins: CryptoCoin[]; total: number }> => {
-  let apiUrl = "https://api.coingecko.com/api/v3";
-  const baseUrl = "https://api.coingecko.com/api/v3/";
+  let apiUrl = "";
+  const baseUrl = "https://api.coingecko.com/api/v3";
   if (showFavoritesOnly) {
     const favoriteIds = getFavoriteIds();
     if (favoriteIds.length === 0) return { coins: [], total: 0 };
-    apiUrl = `${baseUrl}/coins/markets?vs_currency=usd&page=${page}&per_page=10&ids=${favoriteIds.join(
+    apiUrl = `${baseUrl}/coins/markets?vs_currency=usd&ids=${favoriteIds.join(
       ","
     )}&sparkline=true`;
   } else {
@@ -70,15 +41,10 @@ const fetchCryptoData = async (
     }
     const data: CryptoCoin[] = await response.json();
     const total = Number(response.headers.get("total")) || 0;
-    if (!showFavoritesOnly) setCachedData(data, page);
+
     return { coins: data, total: total };
   } catch (error) {
     console.error("Error fetching crypto data:", error);
-    if (!showFavoritesOnly) {
-      const cachedData = getCachedData(page);
-      if (cachedData)
-        return { coins: cachedData.coins, total: cachedData.total };
-    }
     throw error;
   }
 };
@@ -93,9 +59,5 @@ export const useCryptoData = (
     refetchInterval: 30000,
     staleTime: 25000,
     retry: 2,
-    // initialData:
-    //   isClient && !showFavoritesOnly
-    //     ? getCachedData(page) || undefined
-    //     : undefined,
   });
 };

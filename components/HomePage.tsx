@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useCryptoData } from "@/hooks/useCryptoData";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -18,6 +18,8 @@ import ErrorAlert from "./ErrorAlert";
 const HomePage = () => {
   const hydrated = useHydrated();
   const isOffline = useIsOffline();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { favorites, toggleFavorite } = useFavorites();
@@ -48,12 +50,19 @@ const HomePage = () => {
       });
     }
   };
+  const handleToggleFavorites = () => {
+    setShowFavoritesOnly(!showFavoritesOnly);
+    handleRefresh();
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/20">
       <DashboardHeader
         showFavoritesOnly={showFavoritesOnly}
-        onToggleFavorites={() => setShowFavoritesOnly(!showFavoritesOnly)}
+        onToggleFavorites={handleToggleFavorites}
         isRefreshing={isFetching}
         onRefresh={handleRefresh}
         favoriteCount={favorites.size}
@@ -85,11 +94,13 @@ const HomePage = () => {
           page={page}
         />
 
-        {/* {!showFavoritesOnly && ( */}
-        <div className="mt-8">
-          <PaginationSection totalPages={Math.floor(filteredData.total / 10)} />
-        </div>
-        {/* )} */}
+        {!showFavoritesOnly && (
+          <div className="mt-8">
+            <PaginationSection
+              totalPages={Math.floor(filteredData.total / 10)}
+            />
+          </div>
+        )}
       </main>
     </div>
   );

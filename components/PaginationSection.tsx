@@ -35,7 +35,7 @@ const PaginationSection = ({ totalPages }: Props) => {
 
     const items: PageItem[] = [];
 
-    const middleCount = maxVisibleNumbers - 2; // exclude first & last
+    const middleCount = maxVisibleNumbers - 2;
     let start = Math.max(2, currentPage - Math.floor(middleCount / 2));
     let end = start + middleCount - 1;
 
@@ -44,25 +44,20 @@ const PaginationSection = ({ totalPages }: Props) => {
       start = Math.max(2, end - middleCount + 1);
     }
 
-    // First page
     items.push(1);
 
-    // Left ellipsis
     if (start > 2) {
       items.push("ellipsis");
     }
 
-    // Middle pages
     for (let page = start; page <= end; page++) {
       items.push(page);
     }
 
-    // Right ellipsis
     if (end < totalPages - 1) {
       items.push("ellipsis");
     }
 
-    // Last page
     items.push(totalPages);
 
     return items;

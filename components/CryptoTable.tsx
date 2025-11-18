@@ -101,7 +101,7 @@ const CryptoTable = ({
                   </Button>
                 </TableCell>
                 <TableCell className="font-medium text-muted-foreground">
-                  {index + 1 + page * 10}
+                  {index + 1 + (page - 1) * 10}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -125,11 +125,17 @@ const CryptoTable = ({
                   </div>
                 </TableCell>
                 <TableCell className="text-right font-mono font-medium">
-                  $
-                  {coin?.current_price?.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 6,
-                  })}
+                  {coin?.current_price ? (
+                    <>
+                      $
+                      {coin?.current_price?.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 6,
+                      })}
+                    </>
+                  ) : (
+                    "No Price"
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   <span
