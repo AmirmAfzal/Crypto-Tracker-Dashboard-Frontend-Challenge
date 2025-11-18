@@ -1,0 +1,109 @@
+"use client";
+
+import { useState, useMemo } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
+import { useCryptoData } from "@/hooks/useCryptoData";
+import { useFavorites } from "@/hooks/useFavorites";
+import DashboardHeader from "@/components/DashboardHeader";
+import { useToast } from "@/hooks/use-toast";
+import { useHydrated } from "@/hooks/useHydrated";
+import { useIsOffline } from "@/hooks/useIsOffline";
+
+import CryptoTable from "./CryptoTable";
+import PaginationSection from "./PaginationSection";
+import OfflineAlert from "./OfflineAlert";
+import ErrorAlert from "./ErrorAlert";
+
+const HomePage = () => {
+  const hydrated = useHydrated();
+  const isOffline = useIsOffline();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { favorites, toggleFavorite } = useFavorites();
+  const { toast } = useToast();
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
+
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useCryptoData(page, showFavoritesOnly);
+
+  const filteredData = useMemo(() => {
+    return data || { coins: [], total: 0 };
+  }, [data]);
+
+  const handleRefresh = async () => {
+    try {
+      await refetch();
+      toast({
+        title: "Data refreshed",
+        description: "Cryptocurrency data has been updated",
+      });
+    } catch {
+      toast({
+        title: "Refresh failed",
+        description: "Unable to fetch latest data",
+        variant: "destructive",
+      });
+    }
+  };
+  const handleToggleFavorites = () => {
+    setShowFavoritesOnly(!showFavoritesOnly);
+    handleRefresh();
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  return (
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-secondary/20">
+      <DashboardHeader
+        showFavoritesOnly={showFavoritesOnly}
+        onToggleFavorites={handleToggleFavorites}
+        isRefreshing={isFetching}
+        onRefresh={handleRefresh}
+        favoriteCount={favorites.size}
+      />
+
+      <main className="container mx-auto px-4 py-8">
+        {hydrated && isOffline && <OfflineAlert />}
+
+        {isError && !data && <ErrorAlert message={error.message} />}
+
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-2">
+            {showFavoritesOnly ? "Your Favorites" : "Top Cryptocurrencies"}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {showFavoritesOnly
+              ? `Showing ${filteredData.coins.length} favorite ${
+                  filteredData.coins.length === 1 ? "coin" : "coins"
+                }`
+              : "Market data updates every 30 seconds"}
+          </p>
+        </div>
+
+        <CryptoTable
+          data={filteredData.coins}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+          isLoading={isLoading && !data}
+          page={page}
+        />
+
+        {!showFavoritesOnly && (
+          <div className="mt-8">
+            <PaginationSection
+              totalPages={Math.floor(filteredData.total / 10)}
+            />
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default HomePage;
