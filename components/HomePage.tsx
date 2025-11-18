@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { AlertCircle, WifiOff } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { useCryptoData } from "@/hooks/useCryptoData";
 import { useFavorites } from "@/hooks/useFavorites";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useIsOffline } from "@/hooks/useIsOffline";
 
 import CryptoTable from "./CryptoTable";
 import PaginationSection from "./PaginationSection";
+import OfflineAlert from "./OfflineAlert";
+import ErrorAlert from "./ErrorAlert";
 
 const HomePage = () => {
   const hydrated = useHydrated();
@@ -60,27 +60,9 @@ const HomePage = () => {
       />
 
       <main className="container mx-auto px-4 py-8">
-        {hydrated && isOffline && (
-          <Alert className="mb-6 border-yellow-500/50 bg-yellow-500/10">
-            <WifiOff className="h-4 w-4 text-yellow-500" />
-            <AlertTitle className="text-yellow-500">Offline Mode</AlertTitle>
-            <AlertDescription className="text-yellow-600">
-              You`re currently offline. Showing cached data from your last
-              visit.
-            </AlertDescription>
-          </Alert>
-        )}
+        {hydrated && isOffline && <OfflineAlert />}
 
-        {isError && !data && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              {error?.message ||
-                "Failed to load cryptocurrency data. Please try again later."}
-            </AlertDescription>
-          </Alert>
-        )}
+        {isError && !data && <ErrorAlert message={error.message} />}
 
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-2">

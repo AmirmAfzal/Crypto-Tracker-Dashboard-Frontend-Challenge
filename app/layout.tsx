@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
   title: "Crypto Tracker - Real-time Cryptocurrency Prices",
   description:
     "Track the top cryptocurrencies in real-time. Monitor prices, 24h changes, market caps, and trends with our modern crypto dashboard.",

@@ -36,7 +36,7 @@ const setCachedData = (data: CryptoCoin[], page: number) => {
   }
 };
 
-const getFavoriteIds = (): string[] => {
+export const getFavoriteIds = (): string[] => {
   if (!isClient) return [];
   try {
     const stored = localStorage.getItem("crypto-favorites");
@@ -51,16 +51,16 @@ const fetchCryptoData = async (
   page: number,
   showFavoritesOnly?: boolean
 ): Promise<{ coins: CryptoCoin[]; total: number }> => {
-  let apiUrl = "";
-
+  let apiUrl = "https://api.coingecko.com/api/v3";
+  const baseUrl = "https://api.coingecko.com/api/v3/";
   if (showFavoritesOnly) {
     const favoriteIds = getFavoriteIds();
     if (favoriteIds.length === 0) return { coins: [], total: 0 };
-    apiUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&page=${page}&per_page=10&ids=${favoriteIds.join(
+    apiUrl = `${baseUrl}/coins/markets?vs_currency=usd&page=${page}&per_page=10&ids=${favoriteIds.join(
       ","
     )}&sparkline=true`;
   } else {
-    apiUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&sparkline=true&page=${page}&per_page=10&order=market_cap_desc`;
+    apiUrl = `${baseUrl}/coins/markets?vs_currency=usd&sparkline=true&page=${page}&per_page=10&order=market_cap_desc`;
   }
 
   try {
