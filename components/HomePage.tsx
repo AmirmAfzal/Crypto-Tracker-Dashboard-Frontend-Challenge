@@ -14,7 +14,6 @@ import { useIsOffline } from "@/hooks/useIsOffline";
 
 import CryptoTable from "./CryptoTable";
 import PaginationSection from "./PaginationSection";
-import { CryptoCoin } from "@/lib/types/crypto";
 
 const HomePage = () => {
   const hydrated = useHydrated();
@@ -28,13 +27,11 @@ const HomePage = () => {
   const page = Number(searchParams.get("page") || 1);
 
   const { data, isLoading, isError, error, refetch, isFetching } =
-    useCryptoData(page);
+    useCryptoData(page, showFavoritesOnly);
 
   const filteredData = useMemo(() => {
-    if (!data) return [];
-    if (!showFavoritesOnly) return data;
-    return data.filter((coin : CryptoCoin) => favorites.has(coin.id));
-  }, [data, showFavoritesOnly, favorites]);
+    return data || [];
+  }, [data]);
 
   const handleRefresh = async () => {
     try {
@@ -105,11 +102,11 @@ const HomePage = () => {
           isLoading={isLoading && !data}
         />
 
-        {!showFavoritesOnly && (
-          <div className="mt-8">
-            <PaginationSection totalPages={10} />
-          </div>
-        )}
+        {/* {!showFavoritesOnly && ( */}
+        <div className="mt-8">
+          <PaginationSection totalPages={10} />
+        </div>
+        {/* )} */}
       </main>
     </div>
   );
