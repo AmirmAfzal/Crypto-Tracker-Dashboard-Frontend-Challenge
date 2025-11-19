@@ -65,12 +65,8 @@ const CryptoTable = ({
             <TableHead>Coin</TableHead>
             <TableHead className="text-right">Price</TableHead>
             <TableHead className="text-right">24h Change</TableHead>
-            <TableHead className="text-center hidden lg:table-cell">
-              7 Day Trend
-            </TableHead>
-            <TableHead className="text-right hidden md:table-cell">
-              Market Cap
-            </TableHead>
+            <TableHead className="text-center">7 Day Trend</TableHead>
+            <TableHead className="text-right">Market Cap</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -94,7 +90,7 @@ const CryptoTable = ({
                     <Star
                       className={`h-4 w-4 transition-all ${
                         isFavorite
-                          ? "fill-yellow-500 text-yellow-500"
+                          ? "fill-alert text-alert"
                           : "text-muted-foreground"
                       }`}
                     />
@@ -116,7 +112,7 @@ const CryptoTable = ({
                         height={100}
                       />
                     )}
-                    <div>
+                    <div className="mr-6">
                       <div className="font-semibold">{coin.name}</div>
                       <div className="text-sm text-muted-foreground uppercase">
                         {coin.symbol}
@@ -149,7 +145,7 @@ const CryptoTable = ({
                     {priceChange?.toFixed(2)}%
                   </span>
                 </TableCell>
-                <TableCell className="hidden lg:table-cell">
+                <TableCell className="">
                   {coin.sparkline_in_7d?.price &&
                   coin.sparkline_in_7d.price.length > 0 ? (
                     <div className="mx-auto w-32">
@@ -164,7 +160,7 @@ const CryptoTable = ({
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-right font-mono text-muted-foreground hidden md:table-cell">
+                <TableCell className="text-right font-mono text-muted-foreground">
                   ${(coin.market_cap / 1e9).toFixed(2)}B
                 </TableCell>
               </TableRow>
