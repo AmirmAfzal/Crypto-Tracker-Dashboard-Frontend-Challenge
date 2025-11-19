@@ -31,7 +31,7 @@ const DashboardHeader = ({
                 <Activity className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                <h1 className="text-lg md:text-2xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                   Crypto Tracker
                 </h1>
                 <p className="text-xs text-muted-foreground">

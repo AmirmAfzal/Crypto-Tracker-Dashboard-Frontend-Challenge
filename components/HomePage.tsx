@@ -6,7 +6,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCryptoData } from "@/hooks/useCryptoData";
 import { useFavorites } from "@/hooks/useFavorites";
 import DashboardHeader from "@/components/DashboardHeader";
-import { useToast } from "@/hooks/use-toast";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useIsOffline } from "@/hooks/useIsOffline";
 
@@ -23,7 +22,6 @@ const HomePage = () => {
 
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { favorites, toggleFavorite } = useFavorites();
-  const { toast } = useToast();
 
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page") || 1);
@@ -36,20 +34,9 @@ const HomePage = () => {
   }, [data]);
 
   const handleRefresh = async () => {
-    try {
-      await refetch();
-      toast({
-        title: "Data refreshed",
-        description: "Cryptocurrency data has been updated",
-      });
-    } catch {
-      toast({
-        title: "Refresh failed",
-        description: "Unable to fetch latest data",
-        variant: "destructive",
-      });
-    }
+    await refetch();
   };
+  
   const handleToggleFavorites = () => {
     setShowFavoritesOnly(!showFavoritesOnly);
     handleRefresh();
